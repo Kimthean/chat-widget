@@ -39,10 +39,9 @@ function Modal({ visible, onClose }: ModalProps) {
             { message: response.text, sender: "bot" },
           ]);
           setGreetingSent(true);
-        })
-        .finally(() => {
+        }) .finally(() => {
           setIsLoading(false);
-        }); 
+        });
     }
   }, [visible, greetingSent]);
 
@@ -96,11 +95,11 @@ function Modal({ visible, onClose }: ModalProps) {
         <div className="w-full h-14 bg-orange-500 text-white justify-center py-2">
           <div className="px-4 flex items-center">
             <img
-              src="./public/factoryx.webp"
+              src="/factoryx.webp"
               alt="FactoryX Logo"
               className="w-10 h-10 rounded-lg mr-2"
             />
-            <span className="text-2xl font-normal text-black">FactoryX</span>
+            <span className="text-2xl font-normal">FactoryX</span>
           </div>
         </div>
         <button className="absolute top-3 right-4 " onClick={onClose}>
@@ -114,9 +113,9 @@ function Modal({ visible, onClose }: ModalProps) {
                 <div className="flex justify-start">
                   <div className="inline-block px-4 py-2 rounded-3xl bg-gray-300 text-black rounded-bl-none animate-pulse">
                     <div className="flex space-x-2 items-center h-5">
-                      <div className="h-2 w-2 bg-black rounded-full animate-bounce delay-200" />
-                      <div className="h-2 w-2 bg-black rounded-full animate-bounce delay-400" />
-                      <div className="h-2 w-2 bg-black rounded-full animate-bounce delay-600" />
+                      <div className="h-2 w-2 bg-gray-400 rounded-full animate-bounce delay-100" />
+                      <div className="h-2 w-2 bg-gray-400 rounded-full animate-bounce delay-200" />
+                      <div className="h-2 w-2 bg-gray-400 rounded-full animate-bounce delay-300" />
                     </div>
                   </div>
                 </div>
@@ -140,6 +139,12 @@ function Modal({ visible, onClose }: ModalProps) {
             placeholder="Type a message"
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                handleSend();
+              }
+            }}
           />
           <Button
             variant={"ghost"}
