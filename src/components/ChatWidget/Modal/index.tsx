@@ -2,14 +2,16 @@ import { useState, useEffect, useRef } from "react";
 import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import query from "@/lib/bot/chat";
-import { Send, X } from "lucide-react";
+import chat from "@/lib/bot/chat";
+import { Send, ChevronDown } from "lucide-react";
 import { Message } from "./Message";
 
 interface ModalProps {
   visible: boolean;
   onClose: () => void;
-  useAnimation?: boolean;
+  headColor: string;
+  logo: string;
+  title: string;
 }
 
 export interface MessageProps {
@@ -18,28 +20,32 @@ export interface MessageProps {
   isLoading?: boolean;
 }
 
-function Modal({ visible, onClose }: ModalProps) {
+function Modal({ visible, onClose, logo, title, headColor }: ModalProps) {
   const [, setResponse] = useState<string | null>(null);
   const [inputValue, setInputValue] = useState("");
   const [history, setHistory] = useState<MessageProps[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-
   const [greetingSent, setGreetingSent] = useState(false);
   const chatEndRef = useRef<null | HTMLDivElement>(null);
 
   useEffect(() => {
     if (visible && !greetingSent) {
       setIsLoading(true);
+      setHistory((prevHistory) => [
+        ...prevHistory,
+        { message: "...", sender: "bot", isLoading: true },
+      ]);
 
-      query({ question: "I need help!!!." })
+      chat({ question: "Hello" })
         .then((response) => {
           setResponse(response.text);
           setHistory((prevHistory) => [
-            ...prevHistory,
+            ...prevHistory.slice(0, -1),
             { message: response.text, sender: "bot" },
           ]);
           setGreetingSent(true);
-        }) .finally(() => {
+        })
+        .finally(() => {
           setIsLoading(false);
         });
     }
@@ -56,7 +62,7 @@ function Modal({ visible, onClose }: ModalProps) {
 
     setIsLoading(true);
 
-    query({ question: userMessage })
+    chat({ question: userMessage })
       .then((response) => {
         setHistory((prevHistory) => [
           ...prevHistory.slice(0, -1),
@@ -90,21 +96,23 @@ function Modal({ visible, onClose }: ModalProps) {
     <div>
       <div
         onClick={(event) => event.stopPropagation()}
-        className="fixed bottom-24 right-5 w-[400px] max-sm:w-11/12 h-[75vh] max-w-[calc(100%-48px)] max-h-[calc(100%-48px)] border bg-white rounded-xl border-grey overflow-auto shadow-xl flex flex-col"
+        className="fixed bottom-24 right-5 w-[400px] max-sm:w-11/12 h-[65vh] border bg-white rounded-3xl border-grey overflow-auto shadow-xl flex flex-col"
       >
-        <div className="w-full h-14 bg-orange-500 text-white justify-center py-2">
+        <div
+          className={`w-full h-auto ${headColor} text-white flex justify-between items-center py-4 px-1`}
+        >
           <div className="px-4 flex items-center">
             <img
-              src="/factoryx.webp"
+              src={logo}
               alt="FactoryX Logo"
-              className="w-10 h-10 rounded-lg mr-2"
+              className="w-10 h-10 rounded-lg mr-2 items-center"
             />
-            <span className="text-2xl font-normal">FactoryX</span>
+            <span className="text-xl font-normal">{title}</span>
           </div>
+          <button className="mr-5" onClick={onClose}>
+            <ChevronDown color="white" size={32} />
+          </button>
         </div>
-        <button className="absolute top-3 right-4 " onClick={onClose}>
-          <X color="white" />
-        </button>
 
         <div className="flex-grow overflow-y-auto mb-4 flex flex-col p-4">
           {history.map((message, index) => (
@@ -154,6 +162,15 @@ function Modal({ visible, onClose }: ModalProps) {
           >
             <Send />
           </Button>
+        </div>
+        <div className="mb-4 text-sm flex items-center justify-center">
+          Powered By{" "}
+          <img
+            src="./ounai.jpg"
+            alt="ounai logo"
+            className="size-6 rounded-full ml-2"
+          />
+          <span className="ml-2">OunAI</span>
         </div>
       </div>
     </div>
